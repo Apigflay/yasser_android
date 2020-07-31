@@ -1,0 +1,243 @@
+<template>
+	<view class="liveroomArea">
+		222222222
+		<live-pusher id='livePusher' ref="livePusher" class="livePusher" :url="livePusherUrl"
+			mode="SD" :muted="true" :enable-camera="true" :auto-focus="true" :beauty="1" whiteness="2"
+			aspect="9:16" @statechange="statechange" @netstatus="netstatus" @error = "error"
+			></live-pusher>
+			<button class="btn" @click="start">开始推流</button>
+			<button class="btn" @click="pause">暂停推流</button>
+			<button class="btn" @click="resume">resume</button>
+			<button class="btn" @click="stop">停止推流</button>
+			<button class="btn" @click="snapshot">快照</button>
+			<button class="btn" @click="startPreview">开启摄像头预览</button>
+			<button class="btn" @click="stopPreview">关闭摄像头预览</button>
+			<button class="btn" @click="switchCamera">切换摄像头</button>
+			<button class="btn" @click="goKaiSocket">kaibo</button>
+			<button class="btn" @click="zhibo_live">测试推流地址</button>
+		33333333
+		<live-player
+		  src="https://domain/pull_stream"
+		  autoplay
+		  @statechange="Lstatechange"
+		  @error="Lerror"
+		  style="width: 300px; height: 225px;"
+		/>
+		4444444
+		<input class="input" type="text">
+		<view class="" @click="goLoginSocket">一键登录</view>
+		
+	</view>
+	
+</template>
+
+<script>
+	import {encrypt,decrypt,system,systemId,base64ToArrayBuffer,sendData,sendD,work,regMail,navigateTo,sendDSocket} from "../../lib/js/GlobalFunction.js"
+	 export default {
+	        data: {
+	            fil: true,
+				// livePusherUrl:this.$store.getters['AllallPusherAddress']
+	        },
+			onLoad() {
+				var that = this;
+				// setTimeout(function(){
+					// this.context = uni.createLivePusherContext("livePusher", this);
+				// },3000)
+				 
+			},
+			computed:{
+				livePusherUrl(){
+						console.log(this.$store.getters['AllallPusherAddress'])
+					return this.$store.getters['AllallPusherAddress']
+				}
+			},
+	        onReady() {
+	            // 注意：需要在onReady中 或 onLoad 延时
+				this.creatV()
+	            // this.context = uni.createLivePusherContext("livePusher", this);
+	        },
+	        methods: {
+				goLoginSocket:function(){
+					var socketarray = JSON.stringify({
+						"useridx": 1111,//当前用户
+						// "statidx":  11000057,//主播id
+						"statidx":  2222,//主播id
+						"usernick":  '2222',   //用户昵称
+						})
+					console.log(socketarray)
+					uni.onSocketOpen(function (res) {
+					  console.log('WebSocket连接已打开！');
+					  uni.sendSocketMessage({//31005 进入直播间（客户端->服务端）
+						data: sendDSocket(socketarray,31005),
+						success(res) {},
+						complete(com) {
+							console.log(com)
+						}
+					  });
+					});
+					uni.sendSocketMessage({//31005 进入直播间（客户端->服务端）
+					  data: sendDSocket(socketarray,31005),
+					  success(res) {
+					  },
+					  complete(com) {
+						console.log(com)
+					  }
+					});
+					
+					
+					// uni.onSocketMessage(function (res) {
+					// 	console.log(res)
+					// 	let b = new Blob([res.data]);
+					// 	// 
+					// 	// Do(res.data)
+					// 	var fileReader = new FileReader();
+					// 	fileReader.onload = function (progressEvent) {
+					// 		var arrayBuffer = this.result; // arrayBuffer即为blob对应的arrayBuffer
+					// 		var HeadRecv = new Uint32Array(arrayBuffer, 0, 3);
+					// 		var strArray = new Uint8Array(arrayBuffer, 12, HeadRecv[0] - 12 - 1);
+					// 		var str = new TextDecoder().decode(strArray);//{"code":-1,"error":"用户名或密码错误"}
+					// 		// console.log(HeadRecv[1],JSON.parse(str))
+					// 		//to do
+					// 		// resultData.code = HeadRecv[1];
+					// 		// resultData.msg = JSON.parse(str);
+					// 		console.log(HeadRecv[1])
+					// 		console.log(JSON.parse(str))
+					// 			// console.log(resultData)
+					// 			// webMsg(HeadRecv[1],JSON.parse(str))
+					// 	};
+						
+					// 	fileReader.readAsArrayBuffer(b);
+					
+					// });
+				},
+				creatV:function(){
+					var that = this;
+					setTimeout(function(){
+						console.log(that)
+						that.context = uni.createLivePusherContext("livePusher", that);
+					},2000)
+				},
+	            statechange(e) {
+	                console.log("statechange:" + JSON.stringify(e));
+	            },
+	            netstatus(e) {
+	                console.log("netstatus:" + JSON.stringify(e));
+	            },
+	            error(e) {
+	                console.log("error:" + JSON.stringify(e));
+	            },
+	            start: function() {
+	                this.context.start({
+	                    success: (a) => {
+	                        console.log("livePusher.start:" + JSON.stringify(a));
+	                    },
+						complete(com){
+							console.log(com)
+						}
+	                });
+	            },
+	            close: function() {
+	                this.context.close({
+	                    success: (a) => {
+	                        console.log("livePusher.close:" + JSON.stringify(a));
+	                    }
+	                });
+	            },
+	            snapshot: function() {
+	                this.context.snapshot({
+	                    success: (e) => {
+	                        console.log(JSON.stringify(e));
+	                    }
+	                });
+	            },
+	            resume: function() {
+	                this.context.resume({
+	                    success: (a) => {
+	                        console.log("livePusher.resume:" + JSON.stringify(a));
+	                    }
+	                });
+	            },
+	            pause: function() {
+	                this.context.pause({
+	                    success: (a) => {
+	                        console.log("livePusher.pause:" + JSON.stringify(a));
+	                    }
+	                });
+	            },
+	            stop: function() {
+	                this.context.stop({
+	                    success: (a) => {
+	                        console.log(JSON.stringify(a));
+	                    }
+	                });
+	            },
+	            switchCamera: function() {
+	                this.context.switchCamera({
+	                    success: (a) => {
+	                        console.log("livePusher.switchCamera:" + JSON.stringify(a));
+	                    }
+	                });
+	            },
+	            startPreview: function() {
+	                this.context.startPreview({
+	                    success: (a) => {
+	                        console.log("livePusher.startPreview:" + JSON.stringify(a));
+	                    }
+	                });
+	            },
+	            stopPreview: function() {
+	                this.context.stopPreview({
+	                    success: (a) => {
+	                        console.log("livePusher.stopPreview:" + JSON.stringify(a));
+	                    }
+	                });
+	            },
+				Lstatechange(e){
+					console.log('live-player code:', e.detail.code)
+				},
+				Lerror(e){
+					console.error('live-player error:', e.detail.errMsg)
+				},
+				goKaiSocket:function(){
+					
+					// navigateTo('/pages/liveroom/liveroom',null);
+					var array =JSON.stringify({
+						"statidx": 11000036,       //发送者
+					    "passtype":  2,       //直播方式        1.密码直播 2.非密码直播
+					    "liveaddress":  "",       //直播流 roomid
+					    "isRelive":  1,     
+					})
+					// this.$store.commit("set_allisRelogin",false)
+					uni.sendSocketMessage({
+					  data: sendDSocket(array,31001),
+					  success(res) {
+					  	console.log(res)
+					  },
+					  complete(com) {
+					  	console.log(com)
+					  }
+					});
+				},
+				zhibo_live:function(){//直播心跳
+					console.log(this.livePusherUrl)
+				}
+	        }
+	    }
+</script>
+
+<style >
+/* page{
+	width: 750rpx;
+	height: 100%;
+	background-color:red;
+} */
+.liveroomArea{
+	width: 750rpx;
+	/* height: 1900rpx; */
+	background-color:blue;
+}
+.btn{
+	font-size: 20px;
+	color: red;
+}
+</style>

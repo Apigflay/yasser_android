@@ -1,0 +1,76 @@
+{
+  "pages": [],
+  "window": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "直播推流",
+    "navigationBarBackgroundColor": "#F8F8F8",
+    "backgroundColor": "#F8F8F8",
+    "onReachBottomDistance": 50,
+    "scrollIndicator": "none"
+  },
+  "tabBar": {
+    "color": "#7A7E83",
+    "selectedColor": "#3cc51f",
+    "borderStyle": "black",
+    "backgroundColor": "#000",
+    "list": [
+      {
+        "pagePath": "pages/liveroom/liveroom",
+        "iconPath": "static/imgs/room1w.png",
+        "selectedIconPath": "static/imgs/room1y.png",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/search/search",
+        "iconPath": "static/imgs/fang1w.png",
+        "selectedIconPath": "static/imgs/fang1y.png",
+        "text": "搜索"
+      },
+      {
+        "pagePath": "pages/my/my",
+        "iconPath": "static/imgs/mail1w.png",
+        "selectedIconPath": "static/imgs/mail1y.png",
+        "text": "我的"
+      }
+    ]
+  },
+  "nvue": {
+    "pages": {
+      "pages/my/my.html": {
+        "window": {
+          "usingComponents": {}
+        }
+      },
+      "pages/search/search.html": {
+        "window": {
+          "usingComponents": {}
+        }
+      },
+      "pages/detail/detail.html": {
+        "window": {
+          "usingComponents": {}
+        }
+      },
+      "pages/news/index.html": {
+        "window": {
+          "usingComponents": {}
+        }
+      },
+      "pages/liveroom/liveroom.html": {
+        "window": {
+          "usingComponents": {},
+          "titleNView": false
+        }
+      }
+    },
+    "entryPagePath": "pages/liveroom/liveroom"
+  },
+  "nvueCompiler": "uni-app",
+  "splashscreen": {
+    "alwaysShowBeforeRender": true,
+    "autoclose": false
+  },
+  "appname": "livePusherT_android",
+  "compilerVersion": "2.1.3",
+  "usingComponents": {}
+}

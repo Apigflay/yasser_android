@@ -1,0 +1,208 @@
+<template>
+	<view class="startupArea">
+		<button class="mail_c" type="default" @click="getMailNum">获取邮箱验证码</button>
+		<view class="mailnum">
+			<input class="mail_input" type="number" v-model.trim="mailnumber" value="" />
+		</view>
+		<button class="mail_c1" type="default" @click="goLoginMailSocket">使用箱验证码登录</button>
+		<button class="login_btn" @click="goSinLogin" type="default">邮箱一键登录</button>
+		<button class="login_btn" @click="goLoginSocket" type="default">开播</button>
+		<button class="login_btn"  @click="getInitMsg(1)" type="default">get</button>
+		<button class="login_btn"  @click="getInitMsg(2)" type="default">post</button>
+	</view>
+</template>
+
+<script>
+	import {encrypt,decrypt,system,systemId,base64ToArrayBuffer,sendData,sendD,work,regMail,navigateTo,systemall,sendDSocket} from "../../lib/js/GlobalFunction.js"
+	export default {
+		data() {
+			return {
+				mailnumber:'',
+				mailAdress:'283251605@qq.com',
+				systemId:'',
+				urlPoint:'https://live.mycat1314.com'
+			}
+		},
+		created(){
+			this.getSystemId()
+		},
+		methods: {
+			getInitMsg:function(id){
+				if(id==1){
+					console.log(id+'get请求')
+					uni.request({
+					    url: 'http://192.168.12.199:3000/api?id=2', //仅为示例，并非真实接口地址。
+						method:"GET",
+					    data: {
+				
+					    },
+					    header: {
+					        'custom-header': 'hello' //自定义请求头信息
+					    },
+					    success: (res) => {
+					        console.log(res.data);
+					    }
+					});
+				}else if(id==2){
+					uni.request({
+					    url: 'http://192.168.12.199:3000/api/po', //仅为示例，并非真实接口地址。
+						method:"POST",
+					    data: {
+					        id: '3'
+					    },
+					    header: {
+					        'custom-header': 'hello' //自定义请求头信息
+					    },
+					    success: (res) => {
+					        console.log(res.data);
+					    }
+					});
+				}
+			},
+			getSystemId:function(){
+				var that = this;
+				uni.getSystemInfo({
+				    success: function (res) {
+				        // console.log(res);
+						console.log(res.brand,res.model,res.version)
+						that.systemId = res.brand+res.model+res.version;
+				    }
+				});
+			},
+			getMailNum:function(){
+				console.log(this.systemId)
+				var array=uni.base64ToArrayBuffer(encrypt(JSON.stringify({//uni.base64ToArrayBuffer  base64ToArrayBuffer
+					Areacode:'',//	string	区号 输入邮件的时候传空值
+					NumberId:this.mailAdress,//	string	邮箱或者手机号
+					Type:4,//	int	4- 邮箱 1-手机号
+					DeciveId:this.systemId,//	stringstring	设备号
+					DeviceType:"h5",//	string	设备类型
+					// ChannelId:'',//渠道号 
+				})))
+				console.log(array)
+				console.log(this.urlPoint)
+				var res = JSON.parse(decrypt(sendData('POST',this.urlPoint+'/Account/userRegisterPhone',array)));
+				console.log(res)
+				// alert(res.data)
+				if(res.code==100){
+					this.getCheckArea=false;
+					this.mailWriteArea=true;
+					// console.log(this.timeOver)
+					var that=this;
+					var timer = setInterval(function(){
+						that.sixty--;
+						if(that.sixty<=0){
+							clearInterval(timer)
+							that.timeOver=true;
+						}else{
+							that.timeOver=false;
+						}
+						// console.log(that.sixty)
+					},1000)
+				}else{
+					uni.showToast({
+						title: res.msg,
+						duration: 1000,
+						icon:"none",
+					});
+				
+				}
+			},
+			goLoginMailSocket:function(){
+				console.log('邮箱验证码登录')
+				console.log(this.mailAdress)
+				console.log(this.mailnumber)
+				console.log(this.$store)
+				// console.log(systemId())
+				// console.log(system())
+				var array =JSON.stringify({
+					"userName": this.mailAdress,
+					"pwd": this.mailnumber,
+					"devId": 'systemId',
+					"devType": 'android',
+					"productType": 3,
+					"isRelogin": false,
+					"loginWay": 0,
+					"language": 1,
+					"ver": "1.00",
+					"ip":"127.0.0.1"
+				})
+				console.log(array)
+				// this.$store.commit("set_allisRelogin",false)
+				uni.sendSocketMessage({
+				  data: sendDSocket(array,10001)
+				});
+			},
+			goSinLogin:function(){
+				console.log(this.$store.getters['AllallLoginInfo'])
+				var array =JSON.stringify({
+					"userName": this.$store.getters['AllallLoginInfo'].useridx,
+					"pwd": this.$store.getters['AllallLoginInfo'].logintoken,
+					"devId": 'systemId',
+					"devType": 'android',
+					"productType": 3,
+					"isRelogin": true,
+					"loginWay": 0,
+					"language": 1,
+					"ver": "1.00",
+					"ip":"127.0.0.1"
+				})
+				console.log(array)
+				// this.$store.commit("set_allisRelogin",false)
+				uni.sendSocketMessage({
+				  data: sendDSocket(array,10001)
+				});
+			},
+			goLoginSocket:function(){
+				console.log('1')
+				uni.switchTab({
+				    url: '/pages/liveroom/liveroom',
+					success(res) {
+						console.log(res)
+					},
+					fail(err) {
+						console.log(err)
+					}
+				});
+				// navigateTo('/pages/liveroom/liveroom',null);
+				// var array =JSON.stringify({
+				// 	"statidx": 11000057,       //发送者
+				//     "passtype":  2,       //直播方式        1.密码直播 2.非密码直播
+				//     "liveaddress":  "",       //直播流 roomid
+				//     "isRelive":  1,     
+				// })
+				// // this.$store.commit("set_allisRelogin",false)
+				// uni.sendSocketMessage({
+				//   data: sendDSocket(array,31001)
+				// });
+			}
+		}
+	}
+</script>
+
+<style>
+.startupArea{
+	width: 750rpx;
+	background-color:blue;
+}
+.mail_c{
+	margin-top:150rpx;
+	margin-bottom:50rpx;
+}
+.mail_c1{
+	margin-top:50rpx;
+	margin-bottom:50rpx;
+}
+.mail_input{
+	width: 746rpx;
+	height: 100rpx;
+	border-width: 2rpx;
+	border-style: solid;
+	border-color: red;
+	margin-top:50rpx;
+	margin-bottom:50rpx;
+}
+.login_btn{
+	margin-bottom:50rpx;
+}
+</style>
